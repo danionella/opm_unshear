@@ -4,8 +4,8 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/opm_unshear)](https://pypi.org/project/opm_unshear/)
 ![GitHub last commit](https://img.shields.io/github/last-commit/danionella/opm_unshear)
 
-# Oblique Interpolation for Oblique Plane Microscopy (OPM)
-A high-performance CUDA-accelerated oblique interpolation library for OPM volume reconstruction. Avoids aliasing and interpolation artifacts inherent to rectilinear/trilinear approaches.
+# Oblique Interpolation for Oblique Plane Microscopy
+A high-performance CUDA-accelerated oblique interpolation library for oblique plane microscopy (OPM) volume reconstruction. Avoids aliasing and interpolation artifacts inherent to rectilinear/trilinear approaches.
 
 ### Background
 
@@ -23,7 +23,7 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 - Linux or Windows PC
 - CUDA-capable GPU
 
-### Install opm_unshear
+### Install `opm_unshear`
 
 1. Install CUDA Toolkit
 - Using [conda/mamba](https://github.com/conda-forge/miniforge) (recommended): `conda create -n opm_unshear_env -f environment.yml` (or if you already have a conda environment: `conda env update -f environment.yml`)
