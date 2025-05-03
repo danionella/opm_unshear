@@ -6,5 +6,10 @@ dependencies:
   - python>=3.9
   - pip
   - numpy
-  - scipy
   - tqdm
+  - cupy
+  - cuda-nvcc
+  - scipy
+  - h5py
+  - hdf5plugin
+  - tifffile

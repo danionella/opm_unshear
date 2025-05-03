@@ -3,12 +3,6 @@ name: Create pdoc docs for github.pages
 # build the documentation whenever there are new commits on main
 on:
   workflow_dispatch:
-  push:
-  #   branches:
-  #     - main
-  # Alternative: only build for tags.
-    tags:
-      - '*'
 
 # security: restrict permissions for CI jobs.
 permissions:
@@ -37,7 +31,7 @@ jobs:
       - name: Run pdoc
         run: |
           conda activate docs
-          pdoc --no-show-source --docformat google src/my_package -o docs
+          pdoc --no-show-source --docformat google src/opm_unshear -o docs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs/

@@ -1,57 +1,79 @@
-
-
-# Template repository
-
-This is a template repository. After cloning, do the following:
-- add short "about" text on github
-- rename src/my_package
-- edit pyproject.toml
-- edit environment.yml
-- edit .github/create_pdoc.yml
-- edit README.md. See comments of this file (click Raw or Edit)
-- remove /conda and publish_conda.yml unless you have such plans
-
-Conventions that are assumed:
-- Google style docstrings
-
-
-<!--- Replace the README.md with the markdown template below and adjust the details:
-
 ![Python Version](https://img.shields.io/badge/python-3.9+-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![tests](https://github.com/danionella/my_package_replace/actions/workflows/test.yml/badge.svg)
-[![PyPI - Version](https://img.shields.io/pypi/v/my_package_replace)](https://pypi.org/project/my_package_replace/)
-[![Conda Version](https://img.shields.io/conda/v/danionella/my_package_replace)](https://anaconda.org/danionella/my_package_replace)
-![GitHub last commit](https://img.shields.io/github/last-commit/danionella/my_package_replace)
+![tests](https://github.com/danionella/opm_unshear/actions/workflows/test.yml/badge.svg)
+[![PyPI - Version](https://img.shields.io/pypi/v/opm_unshear)](https://pypi.org/project/opm_unshear/)
+![GitHub last commit](https://img.shields.io/github/last-commit/danionella/opm_unshear)
 
-# My_package
-Introductotry paragraph about your repository here.
+# Oblique Interpolation for Oblique Plane Microscopy (OPM)
+A high-performance CUDA-accelerated oblique interpolation library for OPM volume reconstruction. Avoids aliasing and interpolation artifacts inherent to rectilinear/trilinear approaches.
 
-[only applies if you decide to make the documentation public:]
-Links: [API documentation](http://danionella.github.io/my_package), [GitHub repository](https://github.com/danionella/my_package)
+### Background
+
+Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light sheet through the sample. Because the imaging plane is tilted relative to the camera axes, standard rectilinear or trilinear interpolation during volume reconstruction can introduce aliasing artifacts and loss of resolution, that can be ameliorated by oversampling, Fourier stitching or deconvolution (see [McFadden et al. 2025](https://doi.org/10.1364/BOE.555473)).
+
+`opm_unshear` performs true oblique interpolation in the sample’s native coordinate frame, mapping voxels along the tilted plane directly onto an isotropic grid. We achieve both artifact-free reconstructions and – by implementing the core interpolation kernel in CUDA – GPU-accelerated throughput.
+
+### Features
+
+- Oblique interpolation in oblique space, avoiding aliasing from misaligned sampling axes  
+- CUDA-accelerated compute kernel for real-time processing  
 
 ## Installation
-### Hardware requirements
-- a Linux or Windows PC
+### Hardware Requirements
+- Linux or Windows PC
+- CUDA-capable GPU
 
-### Software prerequisites
-- If any
+### Install opm_unshear
 
-### Install my_package
-- For development, clone this repository change to the directory containing `pyproject.toml` 
-- `conda env create -n my_package -f environment.yml`
-- `conda activate my_package`
-- `pip install -e .`
+1. Install CUDA Toolkit
+- Using [conda/mamba](https://github.com/conda-forge/miniforge) (recommended): `conda create -n opm_unshear_env -f environment.yml` (or if you already have a conda environment: `conda env update -f environment.yml`)
+- Using NVIDIA's installer (not recommended): [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads)
 
-[only applies to pulic repositories:]
-- or, via conda: `conda install danionella::my_package `
-- or, if you prefer pip: `pip install my_package`
+2. Install opm_unshear:
+- `conda activate opm_unshear_env` (or the name of your conda environment)
+- `pip install opm_unshear` (or, for development, clone this repository, change to the directory containing `pyproject.toml` and run: `pip install -e .`)
 
-## Use 
-Description of usage, with examples.
+## Use
+
+### Geometry and parameters
+
+
+The oblique interpolation function requires the following parameters:
+- `data`: the input data, a 3D array of shape (p, v, h), where p is the number of oblique planes (camera frames), v is the number of vertical camera pixels, and h is the number of horizontal camera pixels.
+- `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` pixels, between consecutive camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt.
+- `sub_j(int)`: subsampling factor along the vertical direction of the output dataset (along the optical axis). Default is 1. Can often be higher (more subsampling), depending on optical resolution, to reduce memory footprint of the output dataset.
+- `sup_i(int)`: supersampling factor along the plane-scanning direction. Default is 2. Optimal values depend on the plane spacing, optical resolution and desired memory footprint. Values should be between 1 and `abs(slope)` (higher values are possible but there is no gain).
+
+```
+   Example with slope=3, sub_j=2, sup_i=2 (showing a slice along axis 2, or "h"):
+
+               input                                      output
+            o-----o-----o                             o--o--o--o--o
+             \     \     \                            |  |  |  |  |
+              o-----o-----o                           |  |  |  |  |
+               \     \     \                          |  |  |  |  |
+        axis 1  o-----o-----o       -->       axis 1  o--o--o--o--o
+         ("v")   \     \     \                        |  |  |  |  |
+                  o-----o-----o                       |  |  |  |  |
+                   \     \     \                      |  |  |  |  |
+                    o-----o-----o                     o--o--o--o--o
+                        axis 0 ("p")                      axis 0
+```
+
+### Python API
+```python
+import numpy as np
+from opm_unshear import unshear
+
+data = np.random.rand(20, 30, 40).astype(np.float32)
+result = unshear(data, sub_j=2, sup_i=2, slope=1.5)
+```
+### Command line interface (CLI)
+```bash
+python -m opm_unshear --input data.tif --output result.h5 --sub_j 2 --sup_i 2 --slope 5
+```
 
 ## See also
-- related repo  or project 1
-- related repo  or project 1
-
- -->
+- [DaXi](https://github.com/royerlab/daxi)
+- [PetaKit5D](https://github.com/abcucberkeley/PetaKit5D)
+- [LiveDeskew](https://github.com/Jrl-98/Live-Deskewing)
