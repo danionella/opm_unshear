@@ -80,10 +80,9 @@ def main():
     logging.info(f"Loading input volume from {args.input_file}...")
     data, metadata = import_data(args.input_file)
     assert data.ndim == 3, f"Input data must be 3D, but got {data.ndim}D data."
-    x = np.array(data, dtype='float32', order='C')
 
     logging.info(f"Unshearing data of shape ({x.shape}) with sub_j={args.sub_j}, sup_i={args.sup_i}, slope={args.slope}...")
-    result = unshear(x, sub_j=args.sub_j, sup_i=args.sup_i, slope=args.slope).get()
+    result = unshear(data, sub_j=args.sub_j, sup_i=args.sup_i, slope=args.slope).get()
 
     logging.info(f"Saving output data with shape {result.shape} to {args.output_file}...")
     with h5py.File(args.output_file, "w") as f:
