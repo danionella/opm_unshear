@@ -7,7 +7,7 @@ import h5py
 import hdf5plugin
 from tqdm.auto import tqdm
 
-from .unshear import unshear
+from . import unshear
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
@@ -81,8 +81,8 @@ def main():
     data, metadata = import_data(args.input_file)
     assert data.ndim == 3, f"Input data must be 3D, but got {data.ndim}D data."
 
-    logging.info(f"Unshearing data of shape ({x.shape}) with sub_j={args.sub_j}, sup_i={args.sup_i}, slope={args.slope}...")
-    result = unshear(data, sub_j=args.sub_j, sup_i=args.sup_i, slope=args.slope).get()
+    logging.info(f"Unshearing data of shape ({data.shape}) with sub_j={args.sub_j}, sup_i={args.sup_i}, slope={args.slope}...")
+    result = unshear(data, sub_j=args.sub_j, sup_i=args.sup_i, slope=args.slope)
 
     logging.info(f"Saving output data with shape {result.shape} to {args.output_file}...")
     with h5py.File(args.output_file, "w") as f:

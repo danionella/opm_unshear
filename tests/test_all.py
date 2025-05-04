@@ -8,42 +8,38 @@ import pytest
 
 import numpy as np
 
-from opm_unshear import unshear
+import opm_unshear.gpu
+import opm_unshear.cpu
+from opm_unshear import gpu_available
 
-try:
-    import cupy as cp
-
-    _ = cp.cuda.runtime.getDeviceCount()  # Check if any GPU devices are available
-    gpu_available = True
-except (ImportError, cp.cuda.runtime.CUDARuntimeError):
-    gpu_available = False
+if not gpu_available:
     warnings.warn("No GPU detected. Skipping GPU tests.")
 
-
-def test_trivial():
-    assert True == True
-
-
-def test_trivial2():
-    assert False == False
+sample_data = np.random.rand(20, 30, 40).astype(np.float32)
 
 
 @pytest.mark.skipif(not gpu_available, reason="No GPU detected.")
-def test_unshear_basic():
+def test_unshear_gpu():
     """Test basic functionality of the unshear function."""
-    sample_data = cp.random.rand(20, 30, 40, dtype="float32")
-    slope = 2.5
+    slope = 5
     sub_j = 2
     sup_i = 2
-    result = unshear(sample_data, sub_j=sub_j, sup_i=sup_i, slope=slope)
+    result = opm_unshear.gpu.unshear(sample_data, sub_j=sub_j, sup_i=sup_i, slope=slope)
+
+
+def test_unshear_cpu():
+    """Test basic functionality of the unshear function."""
+    slope = 5
+    sub_j = 2
+    sup_i = 2
+    result = opm_unshear.cpu.unshear(sample_data, sub_j=sub_j, sup_i=sup_i, slope=slope)
 
 
 @pytest.mark.skipif(not gpu_available, reason="No GPU detected.")
 def test_cli_basic(tmp_path):
     """Test the CLI with basic arguments."""
-    data = np.random.rand(20, 30, 40).astype(np.float32)
     input_file = tmp_path / "input.npy"
-    np.save(input_file, data)
+    np.save(input_file, sample_data)
     output_file = tmp_path / "output.npy"
     slope = 1.0
     command = ["python", "-m", "opm_unshear", str(input_file), str(output_file), "--slope", str(slope)]

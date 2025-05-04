@@ -23,6 +23,7 @@ dependencies = [
     "hdf5plugin",
     "tifffile",
     "scipy",
+    "numba",
 ]
 
 [project.urls]

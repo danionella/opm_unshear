@@ -7,9 +7,11 @@ dependencies:
   - pip
   - numpy
   - tqdm
-  - cupy
-  - cuda-nvcc
   - scipy
   - h5py
   - hdf5plugin
   - tifffile
+  - numba
+# only needed for GPU operation:
+  - cupy
+  - cuda-nvcc
