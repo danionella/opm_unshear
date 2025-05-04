@@ -44,8 +44,8 @@ def get_slope(n1, n2, M12, M23, dv, dp, polarity=1, theta_iip=None, theta_sample
         dv (float): vertical pixel size (on the camera)
         dp (float): plane separation along the plane-scanning axis.
         polarity (int): scanning polarity (depends on scanning and plane tilt directiona). 1 for positive, -1 for negative.
-        theta_iip (float): angle of the intermedia image plane, in radians. Either this or theta_sample must be provided.
-        theta_sample (float): angle of the sample plane, in radians. Either this or theta_iip must be provided.
+        theta_iip (float): angle of the intermedia image plane (vs optical axis of Obj2), in radians. Either this or theta_sample must be provided.
+        theta_sample (float): angle of the sample plane (vs optical axis of Obj1), in radians. Either this or theta_iip must be provided.
 
     Returns:
         slope (float): slope of the shear in (px along axis 1) / (px along axis 0). Note: this value is always positive. You may still have to fliip the sign depending on scanning polarity.
@@ -69,4 +69,4 @@ def get_slope(n1, n2, M12, M23, dv, dp, polarity=1, theta_iip=None, theta_sample
 
 
 # Explicitly define the public API
-#__all__ = ["unshear", "get_slope"]
+# __all__ = ["unshear", "get_slope"]
