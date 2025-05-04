@@ -19,7 +19,7 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 
 - Oblique interpolation in oblique space, avoiding aliasing from misaligned sampling axes  
 - CUDA-accelerated compute kernel for real-time GPU processing (`opm_unshear.gpu.unshear`, ~1 gigavoxel/s on a NVIDIA RTX 3090)
-- NUMBA-accelerated multi-threaded CPU fallback for non-GPU systems (`opm_unshear.cpu.unshear`, ~0.1 gigavoxel/s on a 16-core CPU)
+- Numba-accelerated multi-threaded CPU fallback for non-GPU systems (`opm_unshear.cpu.unshear`, ~0.1 gigavoxel/s on a 16-core CPU)
 
 ## Installation
 ### Hardware Requirements
