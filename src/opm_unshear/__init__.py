@@ -1,14 +1,19 @@
 """
 .. include:: ../../README.md
 
-## API Documentation
+---
+# API Documentation
 
+## `opm_unshear.unshear`
 
-Depending on GPU presence, `opm_unshear.unshear` mapts to one of the following:
+Depending on GPU presence, `opm_unshear.unshear` maps to one of the following:
 
-`opm_unshear.gpu.unshear` (when GPU is available)
+- `opm_unshear.gpu.unshear` (when GPU is available)
+- `opm_unshear.cpu.unshear` (otherwise)
 
-`opm_unshear.cpu.unshear` (otherwise)
+## `opm_unshear.get_slope`
+
+`get_slope` calculates the slope parameter for `unshear`.
 
 """
 
@@ -61,3 +66,7 @@ def get_slope(n1, n2, M12, M23, dv, dp, polarity=1, theta_iip=None, theta_sample
     slope = (dp / np.tan(theta_sample)) / dz_sample
     slope = slope * polarity
     return slope, theta_sample, theta_iip
+
+
+# Explicitly define the public API
+__all__ = ["unshear", "get_slope"]
