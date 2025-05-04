@@ -16,12 +16,13 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 ### Features
 
 - Oblique interpolation in oblique space, avoiding aliasing from misaligned sampling axes  
-- CUDA-accelerated compute kernel for real-time processing  
+- CUDA-accelerated compute kernel for real-time GPU processing (`opm_unshear.gpu.unshear`, ~250 megavoxels/s on a NVIDIA RTX 3090)
+- NUMBA-accelerated multi-threaded CPU fallback for non-GPU systems (`opm_unshear.cpu.unshear`, ~8 megavoxels/s on a 16-core CPU)
 
 ## Installation
 ### Hardware Requirements
 - Linux or Windows PC
-- CUDA-capable GPU
+- For GPU acceleration (recommended): CUDA-capable GPU (e.g. NVIDIA RTX 3090, A6000, A100, etc.)
 
 ### Install `opm_unshear`
 
@@ -40,13 +41,12 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 
 The oblique interpolation function requires the following parameters:
 - `data`: the input data, a 3D array of shape (p, v, h), where p is the number of oblique planes (camera frames), v is the number of vertical camera pixels, and h is the number of horizontal camera pixels.
-- `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` pixels, between consecutive camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt.
+- `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` pixels, between consecutive camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt. You can also use `opm_unshear.get_slope` to calculate this value. For example: `slope = get_slope(n1=1.33, n2=1, M1_2=1.6, M2_3=2, dv=5, dp=2, theta_iip=np.randians(30))`
 - `sub_j(int)`: subsampling factor along the vertical direction of the output dataset (along the optical axis). Default is 1. Can often be higher (more subsampling), depending on optical resolution, to reduce memory footprint of the output dataset.
-- `sup_i(int)`: supersampling factor along the plane-scanning direction. Default is 2. Optimal values depend on the plane spacing, optical resolution and desired memory footprint. Values should be between 1 and `abs(slope)` (higher values are possible but there is no gain).
+- `sup_i(int)`: supersampling factor along the plane-scanning direction. Default is 2. Optimal values depend on the plane spacing, optical resolution and desired memory footprint. Values should be between 1 and `abs(slope)` (higher values are possible but this just wastes memory).
 
+Example geometry with slope=3, sub_j=2, sup_i=2 (showing a slice along axis 2, or "h"):
 ```
-   Example with slope=3, sub_j=2, sup_i=2 (showing a slice along axis 2, or "h"):
-
                input                                      output
             o-----o-----o                             o--o--o--o--o
              \     \     \                            |  |  |  |  |
@@ -63,10 +63,12 @@ The oblique interpolation function requires the following parameters:
 ### Python API
 ```python
 import numpy as np
-from opm_unshear import unshear
+from opm_unshear import unshear, get_slope
+
+#slope = -slope # depending on the direction of plane scanning
 
 data = np.random.rand(20, 30, 40).astype(np.float32)
-result = unshear(data, sub_j=2, sup_i=2, slope=2.5)
+result = unshear_gpu(data, sub_j=2, sup_i=2, slope=5.0)
 ```
 ### Command line interface (CLI)
 ```bash
@@ -87,7 +89,8 @@ Hoffmann, M., Henninger, J. et al. Blazed oblique plane microscopy reveals scale
   number={1},
   pages={8019},
   year={2023},
-  publisher={Nature Publishing Group}
+  publisher={Nature Publishing Group},
+  doi={10.1038/s41467-023-43741-x}
 }
 ```
 
