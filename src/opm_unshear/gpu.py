@@ -2,7 +2,7 @@ import cupy as cp
 import numpy as np
 import warnings
 
-unshear_kernel = cp.RawKernel(
+_unshear_kernel = cp.RawKernel(
     r"""//cpp highlighting
 
 // Compute a triangular shape (used for linear interpolation).
@@ -121,7 +121,7 @@ def unshear(x, sub_j, sup_i, slope, out=None, tpb=[8, 8, 8], fill_value=0.0):
     if sub_j > np.abs(slope):
         warnings.warn("sub_j > abs(slope) does not make much sense.", UserWarning)
     bpg = np.ceil(np.r_[out.shape] / tpb).astype("int")  # blocks per grid
-    unshear_kernel(
+    _unshear_kernel(
         tuple(bpg),
         tuple(tpb),
         (
