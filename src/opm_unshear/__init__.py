@@ -1,5 +1,15 @@
 """
 .. include:: ../../README.md
+
+## API Documentation
+
+
+Depending on GPU presence, `opm_unshear.unshear` mapts to one of the following:
+
+`opm_unshear.gpu.unshear` (when GPU is available)
+
+`opm_unshear.cpu.unshear` (otherwise)
+
 """
 
 import logging

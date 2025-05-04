@@ -6,12 +6,14 @@ dependencies:
   - python>=3.9
   - pip
   - numpy
+# needed for CPU operation:
+  - numba
+# needed for GPU operation:
+  - cupy
+  - cuda-nvcc
+# needed for CLI:
   - tqdm
   - scipy
   - h5py
   - hdf5plugin
   - tifffile
-  - numba
-# only needed for GPU operation:
-  - cupy
-  - cuda-nvcc
