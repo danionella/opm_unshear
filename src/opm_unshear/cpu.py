@@ -53,7 +53,7 @@ def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0):
     Args:
         x (array): 3D input (planes × cameraY × cameraX), dtype float32.
         sub_j (int): subsampling factor along axis 1.
-        sup_i (int): upsampling factor along axis 0.
+        sup_i (float): upsampling factor along axis 0.
         slope (float): shear slope (px along dim 1) / (px along dim 0).
         out (np.ndarray, optional): pre-allocated output; if None, one is created.
         fill_value (float): value to use where no valid input voxels contribute.
@@ -75,16 +75,17 @@ def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0):
                     o-----o-----o                     o--o--o--o--o
                         axis 0                            axis 0
     """
-    x = np.asarray(x, dtype=np.float32)
-    y0 = x.shape[0] * sup_i
+    x = np.asarray(x, dtype=np.float32, order='C')
+    y0 = int(x.shape[0] * sup_i)
     y1 = x.shape[1] // sub_j
     y2 = x.shape[2]
-
+    if not isinstance(sub_j, int):
+        raise ValueError(f"sub_j must be an integer, got {sub_j} of type {type(sub_j)}")
     if out is None:
         out = np.zeros((y0, y1, y2), dtype=np.float32)
     else:
         assert out.shape == (y0, y1, y2)
         assert out.dtype == np.float32
 
-    _unshear_numba(x, sub_j, sup_i, slope, fill_value, out)
+    _unshear_numba(x, int(sub_j), float(sup_i), float(slope), float(fill_value), out)
     return out
