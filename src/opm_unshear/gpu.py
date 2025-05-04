@@ -121,7 +121,7 @@ def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0, tpb=[8, 8, 8]):
         out = cp.zeros((int(x.shape[0] * sup_i), x.shape[1] // sub_j, x.shape[2]), dtype=x.dtype)
     assert out.dtype == cp.dtype("float32"), "Output array must be float32"
     if sub_j > np.abs(slope):
-        warnings.warn("sub_j > abs(slope) does not make much sense.", UserWarning)
+        warnings.warn(f"sub_j > abs(slope) leads to subsampling! sub_j: {sub_j}, slope: {slope}")
     bpg = np.ceil(np.r_[out.shape] / tpb).astype("int")  # blocks per grid
     _unshear_kernel(
         tuple(bpg),

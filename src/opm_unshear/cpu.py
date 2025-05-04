@@ -81,6 +81,8 @@ def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0):
     y2 = x.shape[2]
     if not isinstance(sub_j, int):
         raise ValueError(f"sub_j must be an integer, got {sub_j} of type {type(sub_j)}")
+    if sub_j > np.abs(slope):
+        warnings.warn(f"sub_j > abs(slope) leads to subsampling! sub_j: {sub_j}, slope: {slope}")
     if out is None:
         out = np.zeros((y0, y1, y2), dtype=np.float32)
     else:
