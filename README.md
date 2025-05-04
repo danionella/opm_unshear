@@ -11,7 +11,7 @@ Links: [API documentation](http://danionella.github.io/opm_unshear), [GitHub rep
 
 ### Background
 
-Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light sheet through the sample. Because the imaging plane is tilted relative to the camera axes, standard rectilinear or trilinear interpolation during volume reconstruction can introduce aliasing artifacts and loss of resolution – which can be ameliorated by oversampling, Fourier stitching or deconvolution (see [McFadden et al. 2025](https://doi.org/10.1364/BOE.555473)).
+Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light sheet through the sample. Because the imaging plane is tilted relative to the camera axes, standard rectilinear or trilinear interpolation during volume reconstruction can introduce aliasing artifacts and loss of resolution – problems that are ameliorated by oversampling, Fourier stitching or deconvolution (see [McFadden et al. 2025](https://doi.org/10.1364/BOE.555473) and [Lamb et al. 2025](https://www.biorxiv.org/content/10.1101/2025.04.30.651458)).
 
 `opm_unshear` performs true oblique interpolation in the sample’s native coordinate frame, mapping voxels along the tilted plane directly onto an isotropic grid. We achieve both artifact-free reconstructions and GPU-accelerated throughput.
 
