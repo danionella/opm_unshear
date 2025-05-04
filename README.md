@@ -24,7 +24,7 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 ## Installation
 ### Hardware Requirements
 - Linux or Windows PC
-- For GPU acceleration (recommended): CUDA-capable GPU (e.g. NVIDIA RTX 3090, A6000, A100, etc.)
+- For GPU acceleration (recommended): CUDA-capable NVIDIA GPU with sufficient memory (≥ 10 bytes per voxel of the volumes to be processed)
 
 ### Install `opm_unshear`
 
