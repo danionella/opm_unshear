@@ -7,6 +7,8 @@
 # Oblique Interpolation for Oblique Plane Microscopy
 A GPU-accelerated oblique interpolation library for oblique plane microscopy (OPM) volume reconstruction. Avoids aliasing and interpolation artifacts inherent to rectilinear/trilinear approaches.
 
+Links: [API documentation](http://danionella.github.io/opm_unshear), [GitHub repository](https://github.com/danionella/opm_unshear)
+
 ### Background
 
 Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light sheet through the sample. Because the imaging plane is tilted relative to the camera axes, standard rectilinear or trilinear interpolation during volume reconstruction can introduce aliasing artifacts and loss of resolution – which can be ameliorated by oversampling, Fourier stitching or deconvolution (see [McFadden et al. 2025](https://doi.org/10.1364/BOE.555473)).
