@@ -38,10 +38,9 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 
 ### Geometry and parameters
 
-
 The oblique interpolation function requires the following parameters:
 - `data`: the input data, a 3D array of shape (p, v, h), where p is the number of oblique planes (camera frames), v is the number of vertical camera pixels, and h is the number of horizontal camera pixels.
-- `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` pixels, between consecutive camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt. You can also use `opm_unshear.get_slope` to calculate this value. For example: `slope = get_slope(n1=1.33, n2=1, M1_2=1.6, M2_3=2, dv=5, dp=2, theta_iip=np.randians(30))`
+- `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` pixels, between consecutive camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt. You can also use `opm_unshear.get_slope` to calculate this value. For example: `slope = get_slope(n1=1.33, n2=1, M12=1.6, M23=2, dv=5, dp=2, polarity=1, theta_sample=np.randians(30) #polarity = 1 or -1, depending on the direction of plane scanning`.
 - `sub_j(int)`: subsampling factor along the vertical direction of the output dataset (along the optical axis). Default is 1. Can often be higher (more subsampling), depending on optical resolution, to reduce memory footprint of the output dataset.
 - `sup_i(int)`: supersampling factor along the plane-scanning direction. Default is 2. Optimal values depend on the plane spacing, optical resolution and desired memory footprint. Values should be between 1 and `abs(slope)` (higher values are possible but this just wastes memory).
 
@@ -65,10 +64,11 @@ Example geometry with slope=3, sub_j=2, sup_i=2 (showing a slice along axis 2, o
 import numpy as np
 from opm_unshear import unshear, get_slope
 
-#slope = -slope # depending on the direction of plane scanning
+slope = get_slope(n1=1.33, n2=1, M12=1.6, M23=2, dv=5, dp=2, theta_sample=np.randians(30), polarity=1)
+#polarity = 1 or -1, depending on the direction of plane scanning
 
 data = np.random.rand(20, 30, 40).astype(np.float32)
-result = unshear_gpu(data, sub_j=2, sup_i=2, slope=5.0)
+result = unshear(data, sub_j=2, sup_i=2, slope=slope)
 ```
 ### Command line interface (CLI)
 ```bash
