@@ -69,4 +69,4 @@ def get_slope(n1, n2, M12, M23, dv, dp, polarity=1, theta_iip=None, theta_sample
 
 
 # Explicitly define the public API
-__all__ = ["unshear", "get_slope"]
+#__all__ = ["unshear", "get_slope"]
