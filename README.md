@@ -5,13 +5,13 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/danionella/opm_unshear)
 
 # Oblique Interpolation for Oblique Plane Microscopy
-A high-performance CUDA-accelerated oblique interpolation library for oblique plane microscopy (OPM) volume reconstruction. Avoids aliasing and interpolation artifacts inherent to rectilinear/trilinear approaches.
+A GPU-accelerated oblique interpolation library for oblique plane microscopy (OPM) volume reconstruction. Avoids aliasing and interpolation artifacts inherent to rectilinear/trilinear approaches.
 
 ### Background
 
-Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light sheet through the sample. Because the imaging plane is tilted relative to the camera axes, standard rectilinear or trilinear interpolation during volume reconstruction can introduce aliasing artifacts and loss of resolution, that can be ameliorated by oversampling, Fourier stitching or deconvolution (see [McFadden et al. 2025](https://doi.org/10.1364/BOE.555473)).
+Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light sheet through the sample. Because the imaging plane is tilted relative to the camera axes, standard rectilinear or trilinear interpolation during volume reconstruction can introduce aliasing artifacts and loss of resolution – which can be ameliorated by oversampling, Fourier stitching or deconvolution (see [McFadden et al. 2025](https://doi.org/10.1364/BOE.555473)).
 
-`opm_unshear` performs true oblique interpolation in the sample’s native coordinate frame, mapping voxels along the tilted plane directly onto an isotropic grid. We achieve both artifact-free reconstructions and – by implementing the core interpolation kernel in CUDA – GPU-accelerated throughput.
+`opm_unshear` performs true oblique interpolation in the sample’s native coordinate frame, mapping voxels along the tilted plane directly onto an isotropic grid. We achieve both artifact-free reconstructions and GPU-accelerated throughput.
 
 ### Features
 
@@ -66,11 +66,29 @@ import numpy as np
 from opm_unshear import unshear
 
 data = np.random.rand(20, 30, 40).astype(np.float32)
-result = unshear(data, sub_j=2, sup_i=2, slope=1.5)
+result = unshear(data, sub_j=2, sup_i=2, slope=2.5)
 ```
 ### Command line interface (CLI)
 ```bash
 python -m opm_unshear --input data.tif --output result.h5 --sub_j 2 --sup_i 2 --slope 5
+```
+
+## Citing our work
+If you use `opm_unshear` in your research, please cite the paper that first described our interpolation approach:
+
+Hoffmann, M., Henninger, J. et al. Blazed oblique plane microscopy reveals scale-invariant inference of brain-wide population activity. Nature Communications 14, 8019 (2023). [https://doi.org/10.1038/s41467-023-43741-x](https://doi.org/10.1038/s41467-023-43741-x)
+
+```bibtex
+@article{Hoffmann2023,
+  title={Blazed oblique plane microscopy reveals scale-invariant inference of brain-wide population activity},
+  author={Hoffmann, Maximilian and Henninger, Jorg and Veith, Johannes and Richter, Lars and Judkewitz, Benjamin},
+  journal={Nature Communications},
+  volume={14},
+  number={1},
+  pages={8019},
+  year={2023},
+  publisher={Nature Publishing Group}
+}
 ```
 
 ## See also
