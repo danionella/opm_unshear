@@ -84,20 +84,20 @@ extern "C" __global__ void unshear_kernel(float * y, const int * y_sh, const flo
 )
 
 
-def unshear(x, sub_j, sup_i, slope, out=None, tpb=[8, 8, 8], fill_value=0.0):
-    r"""Unshear a volume using anisotropic linear interpolation on the GPU.
+def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0, tpb=[8, 8, 8]):
+    r"""Unshear a volume using anisotropic linear interpolation.
 
     Args:
-        x (array): 3D-Volume: planes (axis 0) by cameraY (axis 1) by cameraX (axis 2)
+        x (array): 3D-Volume: planes (axis 0) by cameraY (axis 1) by cameraX (axis 2). Can be a numpy or cupy array.
         sup_i (int): upsampling factor along axis 0. Set to 1 (no upsampling) or larger.
         sub_j (int): subsampling factor along axis 1. Set to 1 (no subsampling) or larger. This should not be larger than the slope to avoid undersampling.
         slope (float): shear slope in (px along dim 1)/(px along dim 0). You can use `get_slope` to calculate this value.
         out (array): 3D-Volume where output is saved. Defaults to None (creates a new array).
-        tpb (list): CUDA-Threads per Block. Default: [8, 8, 8]
         fill_value (float32): empty voxels will be filled with this value. Default: 0.0
-    
+        tpb (list): CUDA-Threads per Block. Default: [8, 8, 8]
+
     Returns
-        array: Unsheared GPU-array
+        array: Unsheared array (cupy or numpy array, depending on the input).
 
     Example with sub_j=2, sup_i=2, slope=3 (showing a slice along axis 2):
 

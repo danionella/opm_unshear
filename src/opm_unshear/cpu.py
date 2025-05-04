@@ -48,10 +48,10 @@ def _unshear_numba(x, sub_j, sup_i, slope, fill_value, out):
 
 def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0):
     """
-    Unshear a 3D array using anisotropic linear interpolation on the CPU via Numba.
+    Unshear a 3D array using anisotropic linear interpolation.
 
     Args:
-        x (np.ndarray): 3D input (planes × cameraY × cameraX), dtype float32.
+        x (array): 3D input (planes × cameraY × cameraX), dtype float32.
         sub_j (int): subsampling factor along axis 1.
         sup_i (int): upsampling factor along axis 0.
         slope (float): shear slope (px along dim 1) / (px along dim 0).
@@ -59,7 +59,7 @@ def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0):
         fill_value (float): value to use where no valid input voxels contribute.
 
     Returns:
-        np.ndarray: the unsheared volume, dtype float32.
+        array: the unsheared volume, dtype float32.
 
     Example with sub_j=2, sup_i=2, slope=3 (showing a slice along axis 2):
 
