@@ -46,3 +46,20 @@ def test_cli_basic(tmp_path):
     result = subprocess.run(command, capture_output=True, text=True)
     assert result.returncode == 0, f"CLI failed with error: {result.stderr}"
     assert os.path.exists(output_file), "Output file should be created by the CLI."
+
+
+def test_get_slope():
+    """Test the get_slope function with known parameters."""
+    n1 = 1.33  # refractive index at the sample
+    n2 = 1.0  # refractive index at the intermediate image plane
+    M12 = 1.6  # magnification from Obj1 to Obj2
+    M23 = 2.0  # magnification from Obj2 to Obj3
+    dv = 5.0  # vertical pixel size (on the camera)
+    dp = 2.0  # plane separation along the plane-scanning axis
+    theta_sample = np.radians(30)  # sample plane angle in radians
+    polarity = 1  # scanning polarity
+
+    # Call the function
+    slope, theta_sample_out, theta_iip_out = opm_unshear.get_slope(
+        n1=n1, n2=n2, M12=M12, M23=M23, dv=dv, dp=dp, polarity=polarity, theta_sample=theta_sample
+    )
