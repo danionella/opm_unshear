@@ -30,7 +30,7 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 
 1. Install CUDA Toolkit
 - Using [conda/mamba](https://github.com/conda-forge/miniforge) (recommended): `conda create -n opm_unshear_env -f environment.yml` (or if you already have a conda environment: `conda env update -f environment.yml`)
-- Using NVIDIA's installer (not recommended): [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads)
+- Using [NVIDIA's installer](https://developer.nvidia.com/cuda-downloads) (not recommended)
 
 2. Install opm_unshear:
 - `conda activate opm_unshear_env` (or the name of your conda environment)
@@ -42,7 +42,7 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 
 The oblique interpolation function requires the following parameters:
 - `data`: the input data, a 3D array of shape (p, v, h), where p is the number of oblique planes (camera frames), v is the number of vertical camera pixels, and h is the number of horizontal camera pixels.
-- `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` pixels, between consecutive camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt. You can also use `opm_unshear.get_slope` to calculate this value.
+- `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` camera pixels, between consecutive camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt. You can also use `opm_unshear.get_slope` to calculate this value.
 - `sub_j(int)`: subsampling factor along the vertical direction of the output dataset (along the optical axis). Values should be between 1 (no subsampling)  and `abs(slope)`. Larger values reducethe memory footprint of the output dataset (and are often justified in OPM, depending on axial resolution).
 - `sup_i(float)`: supersampling factor along the plane-scanning direction. Values should be between 1 and `abs(slope)` (higher values are possible but this just wastes memory). Optimal values depend on the plane spacing, optical resolution and desired memory footprint.
 
