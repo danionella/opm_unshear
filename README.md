@@ -28,9 +28,8 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 
 ### Install `opm_unshear`
 
-1. Install CUDA Toolkit
-- Using [conda/mamba](https://github.com/conda-forge/miniforge) (recommended): `conda create -n opm_unshear_env -f environment.yml` (or if you already have a conda environment: `conda env update -f environment.yml`)
-- Using [NVIDIA's installer](https://developer.nvidia.com/cuda-downloads) (not recommended)
+1. Install dependencies using [conda/mamba](https://github.com/conda-forge/miniforge):
+- clone this repository or download [environment.yml](https://github.com/danionella/opm_unshear/blob/main/environment.yml) and type `conda create -n opm_unshear_env -f environment.yml` (or if you already have a conda environment: `conda env update -f environment.yml`)
 
 2. Install opm_unshear:
 - `conda activate opm_unshear_env` (or the name of your conda environment)
