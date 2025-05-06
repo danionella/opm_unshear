@@ -47,7 +47,7 @@ def _unshear_numba(x, sub_j, sup_i, slope, fill_value, out):
 
 
 def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0):
-    """
+    r"""
     Unshear a 3D array using anisotropic linear interpolation.
 
     Args:
