@@ -42,8 +42,8 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 The oblique interpolation function requires the following parameters:
 - `data`: the input data, a 3D array of shape `(p, v, h)`, where `p` is the number of oblique planes (camera frames), `v` is the number of vertical camera pixels, and `h` is the number of horizontal camera pixels. (note that we are using numpy-standard C-order indexing, where the axes are ordered from slowest-varying to fastest-varying)
 - `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` camera pixels, between consecutive camera frames. It can be estimated in practice by imaging any structured sample and inspecting the apparent drift between camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt. You can also use `opm_unshear.get_slope` to calculate this value based on setup parameters.
-- `sub_j(int)`: subsampling factor along the vertical direction of the output dataset (along the optical axis). Values should be between 1 (no subsampling)  and `abs(slope)`. Larger values reducethe memory footprint of the output dataset (and are often justified in OPM, depending on axial resolution).
-- `sup_i(float)`: supersampling factor along the plane-scanning direction. Values should be between 1 and `abs(slope)` (higher values are possible but this just wastes memory). Optimal values depend on the plane spacing, optical resolution and desired memory footprint.
+- `sub_j(int)`: subsampling factor along the vertical direction (axis 1, along the optical axis) of the output dataset. Values should be between 1 (no subsampling)  and `abs(slope)`.
+- `sup_i(float)`: supersampling factor along the plane-scanning direction (axis 0 of the output). Values should be between 1 and `abs(slope)` (higher values are possible but this just wastes memory).
 
 Example geometry with slope=3, sub_j=2, sup_i=2 (showing a slice along axis 2, or "h"):
 ```
