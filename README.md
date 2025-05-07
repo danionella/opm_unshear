@@ -76,6 +76,10 @@ result = unshear(data, sub_j=2, sup_i=2, slope=slope)
 python -m opm_unshear --input data.tif --output result.h5 --sub_j 2 --sup_i 2 --slope 5
 ```
 
+- `--input`: path to the input file containing a 3D dataset to be deskewed (.h5, .nii, .mat, .npy, .tiff). For hierarchical file formats (.h5 or .mat), specify the dataset name using the format `filename.h5:dataset_name`.
+- `--output`: path to the output file (.h5)
+- all other parameters as described above
+
 ## Citing our work
 If you use `opm_unshear` in your research, please cite the paper that first described our interpolation approach:
 
