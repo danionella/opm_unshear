@@ -31,7 +31,7 @@ jobs:
       - name: Run pdoc
         run: |
           conda activate docs
-          pdoc --no-show-source --docformat google src/opm_unshear -o docs
+          pdoc --docformat google src/opm_unshear -o docs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs/
