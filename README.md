@@ -80,6 +80,19 @@ python -m opm_unshear --input data.tif --output result.h5 --sub_j 2 --sup_i 2 --
 - `--output`: path to the output file (.h5)
 - all other parameters as described above
 
+## Feedback and contributions
+
+We value your feedback! If you encounter  issues, have suggestions for improvements, or simply want to let us know that `opm_unshear` worked well for you, please reach out:
+
+- **Bug Reports**: Open an issue on our [GitHub Issues page](https://github.com/danionella/opm_unshear/issues).
+- **Feature Requests**: If you have ideas for new features, feel free to suggest them via a GitHub issue.
+- **Success Stories**: Share how `opm_unshear` worked for you on our [Discussions page](https://github.com/danionella/opm_unshear/discussions).
+
+We welcome contributions! Please:
+- Follow the existing coding style and include tests for new features or fixes.
+- Fork the repo, create a branch, and submit a pull request (PR) with a clear description.
+
+
 ## Citing our work
 If you use `opm_unshear` in your research, please cite the paper that first described our interpolation approach:
 
