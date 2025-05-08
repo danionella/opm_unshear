@@ -86,7 +86,6 @@ We value your feedback! If you encounter  issues, have suggestions for improveme
 
 - **Bug Reports**: Open an issue on our [GitHub Issues page](https://github.com/danionella/opm_unshear/issues).
 - **Feature Requests**: If you have ideas for new features, feel free to suggest them via a GitHub issue.
-- **Success Stories**: Share how `opm_unshear` worked for you on our [Discussions page](https://github.com/danionella/opm_unshear/discussions).
 
 We welcome contributions! Please:
 - Follow the existing coding style and include tests for new features or fixes.
