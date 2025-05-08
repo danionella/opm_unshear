@@ -100,6 +100,6 @@ Hoffmann, M., Henninger, J. et al. Blazed oblique plane microscopy reveals scale
 ```
 
 ## See also
-- [DaXi](https://github.com/royerlab/daxi)
+- [dexp](https://github.com/royerlab/dexp)
 - [PetaKit5D](https://github.com/abcucberkeley/PetaKit5D)
 - [LiveDeskew](https://github.com/Jrl-98/Live-Deskewing)
