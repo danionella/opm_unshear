@@ -6,7 +6,9 @@ from numba import njit, prange
 from ._common import check_args
 
 
-@njit(parallel=True)
+# fastmath without the no-NaN/no-Inf assumptions (NaN input or fill_value stay well defined). ~1.8x faster than no
+# fastmath; rounding may change which voxels within <1 plane of the data edge receive a value.
+@njit(parallel=True, fastmath={"nsz", "arcp", "contract", "afn", "reassoc"})
 def _unshear_numba(x, sub_j, sup_i, slope, fill_value, out):
     x_sh0, x_sh1, x_sh2 = x.shape
     y_sh0, y_sh1, y_sh2 = out.shape

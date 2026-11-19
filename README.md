@@ -28,12 +28,14 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 
 ### Install `opm_unshear`
 
-1. Install dependencies using [conda/mamba](https://github.com/conda-forge/miniforge):
-- clone or download [environment.yml](https://raw.githubusercontent.com/danionella/opm_unshear/refs/heads/main/environment.yml) and type `conda create -n opm_unshear_env -f environment.yml` (or if you already have a conda environment: `conda env update -f environment.yml`)
+1. Install dependencies using [conda/mamba](https://github.com/conda-forge/miniforge) (recommended, installs CuPy and the CUDA libraries for GPU support):
+- clone or download [environment.yml](https://raw.githubusercontent.com/danionella/opm_unshear/refs/heads/main/environment.yml) and type `conda env create -n opm_unshear_env -f environment.yml` (or if you already have a conda environment: `conda env update -f environment.yml`)
 
 2. Install opm_unshear:
 - `conda activate opm_unshear_env` (or the name of your conda environment)
-- `pip install opm_unshear` (or, for development, clone this repository, change to the directory containing `pyproject.toml` and run: `pip install -e .`)
+- `pip install "opm_unshear[cli]"` (or, for development, clone this repository, change to the directory containing `pyproject.toml` and run: `pip install -e ".[test]"`)
+
+Without conda, `pip install opm_unshear` installs the CPU version (NumPy + Numba). For GPU support without conda, use `pip install "opm_unshear[gpu]"` (installs `cupy-cuda12x`; do not combine with a conda-installed CuPy). The extra `[cli]` adds the packages needed by the command line interface (h5py, hdf5plugin, tifffile, scipy).
 
 ## Use
 
@@ -41,9 +43,10 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 
 The oblique interpolation function requires the following parameters:
 - `data`: the input data, a 3D array of shape `(p, v, h)`, where `p` is the number of oblique planes (camera frames), `v` is the number of vertical camera pixels, and `h` is the number of horizontal camera pixels. (note that we are using numpy-standard C-order indexing, where the axes are ordered from slowest-varying to fastest-varying)
-- `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` camera pixels, between consecutive camera frames. It can be estimated in practice by imaging any structured sample and inspecting the apparent drift between camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt. You can also use `opm_unshear.get_slope` to calculate this value based on setup parameters.
+- `slope(float)`: Imagining an ideal pencil parallel to the optical axis, this is the shift of the pencil image, in `v` camera pixels, between consecutive camera frames. It can be estimated in practice by imaging any structured sample and inspecting the apparent drift between camera frames. This parameter can be positive or negative, depending on the direction of plane scanning or oblique plane tilt. You can also use `opm_unshear.get_slope` to calculate this value based on setup parameters (angles are measured between the oblique plane and the optical axis). For a sheet at angle θ to the optical axis, a scan step `dp` and a camera pixel size `p` (in the sample, along the sheet), `slope = dp / (p · sin θ)`.
 - `sub_j(int)`: subsampling factor along the vertical direction (axis 1, along the optical axis) of the output dataset. Values should be between 1 (no subsampling)  and `abs(slope)`.
 - `sup_i(float)`: supersampling factor along the plane-scanning direction (axis 0 of the output). Values should be between 1 and `abs(slope)` (higher values are possible but this just wastes memory).
+- `fill_value(float, optional)`: value of output voxels that receive no input data (default 0). Note that the output covers the input's plane range at mid-height (axis 1), so two corners of the output volume are always empty.
 
 Example geometry with slope=3, sub_j=2, sup_i=2 (showing a slice along axis 2, or "h"):
 ```
@@ -73,12 +76,14 @@ result = unshear(data, sub_j=2, sup_i=2, slope=slope)
 ```
 ### Command line interface (CLI)
 ```bash
-python -m opm_unshear --input data.h5:dataset_name --output result.h5 --sub_j 2 --sup_i 2 --slope 5
+python -m opm_unshear data.h5:dataset_name result.h5 --sub_j 2 --sup_i 2 --slope 5
 ```
 
-- `--input`: path to the input file containing a 3D dataset to be deskewed (.h5, .mat, .nii, .npy). For hierarchical file formats (.h5 or .mat), specify the dataset name using the format `filename.h5:dataset_name`. Note that the dataset's axes have to be ordered as described above.
-- `--output`: path to the output file (.h5)
-- all other parameters as described above
+- first argument: path to the input file containing a 3D dataset to be deskewed (.npy, .tif/.tiff, .h5/.hdf5, .mat). For hierarchical file formats (.h5 or .mat), specify the dataset name using the format `filename.h5:dataset_name`. Note that the dataset's axes have to be ordered as described above.
+- second argument (optional): path to the output file (.h5, default: `unshear_output.h5`). The result is stored in the dataset `unsheared_data`.
+- `--slope` (required), `--sub_j`, `--sup_i`, `--fill_value`: as described above
+- `--out_dtype`: output data type (default: float32; integer types are rounded and clipped)
+- the GPU implementation is used if available, otherwise the CPU implementation
 
 ## Feedback and contributions
 

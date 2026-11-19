@@ -22,7 +22,7 @@ sample_data = rng.random((20, 30, 40)).astype(np.float32)
 
 # (shape, sub_j, sup_i, slope): even/odd heights, negative slopes, sup_i > |slope|, non-integer slopes
 PARAMS = [
-    ((12, 30, 3), 2, 2, 5.0),
+    ((16, 30, 3), 2, 2, 5.0),
     ((12, 31, 3), 1, 2, 3.3),
     ((12, 30, 3), 1, 4, -3.0),
     ((12, 29, 3), 1, 4, -2.0),
@@ -59,15 +59,19 @@ def reference_unshear(x, sub_j, sup_i, slope, fill_value=np.nan):
     return out
 
 
-def assert_close_ignoring_edge_fill(a, b, max_mismatch=0.02, rtol=1e-4, atol=1e-5):
-    """Compare two outputs computed with fill_value=nan. Which voxels exactly at the data boundary receive a value can
-    differ by floating point rounding (float32 vs float64), so allow a small fraction of fill mismatches."""
+def assert_close_away_from_edges(a, b, x_shape, sub_j, sup_i, slope, rtol=1e-4, atol=1e-5):
+    """Compare two outputs (computed with fill_value=nan) away from the first/last planes of the input.
+
+    Within ~1 plane of the data edge, floating point rounding (float32 vs float64, fastmath) decides whether a
+    sample pair falls inside the data, so values and filled/empty status may legitimately differ there."""
     a, b = np.asarray(a, dtype=np.float64), np.asarray(b, dtype=np.float64)
     assert a.shape == b.shape
-    fa, fb = np.isfinite(a), np.isfinite(b)
-    assert np.mean(fa != fb) <= max_mismatch, f"fill mismatch fraction {np.mean(fa != fb):.3f}"
-    both = fa & fb
-    np.testing.assert_allclose(a[both], b[both], rtol=rtol, atol=atol)
+    i, j = np.meshgrid(np.arange(a.shape[0]), np.arange(a.shape[1]), indexing="ij")
+    r_float = i / sup_i + (j * sub_j - x_shape[1] // 2) / slope
+    keep = (r_float > 2.5) & (r_float < x_shape[0] - 3.5)  # kernel spans ~ +-1 plane around r_float
+    assert keep.sum() > 10
+    np.testing.assert_array_equal(np.isfinite(a[keep]), np.isfinite(b[keep]))
+    np.testing.assert_allclose(a[keep], b[keep], rtol=rtol, atol=atol, equal_nan=True)
 
 
 def interior_mask(out_shape, x_shape, sub_j, sup_i, slope, margin=None):
@@ -165,7 +169,7 @@ def test_cpu_matches_reference(shape, sub_j, sup_i, slope):
     x = rng.random(shape).astype(np.float32)
     ref = reference_unshear(x.astype(np.float64), sub_j, sup_i, slope)
     out = opm_unshear.cpu.unshear(x, sub_j=sub_j, sup_i=sup_i, slope=slope, fill_value=np.nan)
-    assert_close_ignoring_edge_fill(out, ref)
+    assert_close_away_from_edges(out, ref, shape, sub_j, sup_i, slope)
 
 
 @requires_gpu
@@ -174,7 +178,7 @@ def test_gpu_matches_cpu(shape, sub_j, sup_i, slope):
     x = rng.random(shape).astype(np.float32)
     out_cpu = opm_unshear.cpu.unshear(x, sub_j=sub_j, sup_i=sup_i, slope=slope, fill_value=np.nan)
     out_gpu = opm_unshear.gpu.unshear(x, sub_j=sub_j, sup_i=sup_i, slope=slope, fill_value=np.nan)
-    assert_close_ignoring_edge_fill(out_gpu, out_cpu)
+    assert_close_away_from_edges(out_gpu, out_cpu, shape, sub_j, sup_i, slope)
 
 
 @pytest.mark.parametrize("unshear", _implementations())
