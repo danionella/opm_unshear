@@ -37,6 +37,8 @@ Oblique Plane Microscopy (OPM) acquires 3D volumes by scanning an inclined light
 
 Without conda, `pip install opm_unshear` installs the CPU version (NumPy + Numba). For GPU support without conda, use `pip install "opm_unshear[gpu]"` (installs `cupy-cuda12x`; do not combine with a conda-installed CuPy). The extra `[cli]` adds the packages needed by the command line interface (h5py, hdf5plugin, tifffile, scipy).
 
+`opm_unshear.unshear` uses the GPU implementation if an NVIDIA driver, CuPy and a GPU are found, and the CPU implementation otherwise (`opm_unshear.gpu_available` tells which). Set the environment variable `OPM_UNSHEAR_FORCE_CPU=1` to always use the CPU.
+
 ## Use
 
 ### Geometry and parameters

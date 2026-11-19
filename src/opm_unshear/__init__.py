@@ -17,18 +17,43 @@ Depending on GPU presence, `opm_unshear.unshear` maps to one of the following:
 
 """
 
+import ctypes
 import logging
+import os
+import sys
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
-try:
-    import cupy as cp
 
-    cp.cuda.runtime.getDeviceCount()  # raises if no driver / no device
-    gpu_available = True
-except Exception:  # ImportError, CUDARuntimeError, missing CUDA libraries, ...
-    gpu_available = False
+def _cuda_driver_present():
+    """Check for the NVIDIA driver library without touching CuPy. Without a driver, some CuPy builds crash
+    (access violation on Windows) instead of raising when querying devices."""
+    names = {"win32": ["nvcuda.dll"], "linux": ["libcuda.so.1", "libcuda.so"]}.get(sys.platform, [])
+    for name in names:
+        try:
+            ctypes.CDLL(name)
+            return True
+        except OSError:
+            pass
+    return False
+
+
+def _detect_gpu():
+    if os.environ.get("OPM_UNSHEAR_FORCE_CPU", "").lower() in ("1", "true", "yes"):
+        return False
+    if not _cuda_driver_present():
+        return False
+    try:
+        import cupy as cp
+
+        return cp.cuda.runtime.getDeviceCount() > 0
+    except Exception:  # ImportError, CUDARuntimeError, missing CUDA libraries, ...
+        return False
+
+
+gpu_available = _detect_gpu()
 
 if gpu_available:
     from .gpu import unshear
