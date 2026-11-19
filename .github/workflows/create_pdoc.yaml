@@ -1,6 +1,6 @@
 name: Create pdoc docs for github.pages
 
-# build the documentation whenever there are new commits on main
+# build the documentation on demand (Actions tab -> Run workflow)
 on:
   workflow_dispatch:
 
@@ -16,7 +16,7 @@ jobs:
       run:
         shell: bash -l {0}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opm_unshear"
-version = "0.0.1"
-description = "opm_unshear for Python"
+version = "0.1.0"
+description = "Oblique interpolation (unshearing / deskewing) for oblique plane microscopy"
 authors = [
     { name = "jlab.berlin" },
     { name = "Maximilian Hoffmann" },
@@ -13,18 +13,19 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-keywords = ["opm_unshear", "python"]
+keywords = ["opm_unshear", "python", "oblique plane microscopy", "deskew", "unshear"]
 requires-python = ">=3.9"
 dependencies = [
     "numpy",
-    "tqdm", 
-    "cupy", 
-    "h5py",
-    "hdf5plugin",
-    "tifffile",
-    "scipy",
     "numba",
 ]
+
+[project.optional-dependencies]
+# GPU support. If you use conda (see environment.yml), install cupy from conda-forge instead of this extra.
+gpu = ["cupy-cuda12x"]
+# command line interface (python -m opm_unshear)
+cli = ["h5py", "hdf5plugin", "tifffile", "scipy"]
+test = ["pytest", "h5py", "hdf5plugin", "tifffile", "scipy"]
 
 [project.urls]
 Homepage = "https://github.com/danionella/opm_unshear"
