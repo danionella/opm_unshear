@@ -1,16 +1,20 @@
-import numpy as np
-import warnings
 import math
+
+import numpy as np
 from numba import njit, prange
 
+from ._common import check_args
 
-@njit(parallel=True, fastmath=True)
+
+@njit(parallel=True)
 def _unshear_numba(x, sub_j, sup_i, slope, fill_value, out):
     x_sh0, x_sh1, x_sh2 = x.shape
     y_sh0, y_sh1, y_sh2 = out.shape
     abs_slope = abs(slope)
     width_i = max(1.0 / sup_i, 1.0 / abs_slope)
     slope_int = int(abs_slope)
+    # integer centre, identical to the GPU kernel (x_sh[1]/2 in C integer arithmetic)
+    center = float(x_sh1 // 2)
 
     for i in prange(y_sh0):
         for j in range(y_sh1):
@@ -19,7 +23,7 @@ def _unshear_numba(x, sub_j, sup_i, slope, fill_value, out):
                 norm = 0.0
                 for jj in range(-slope_int, slope_int + 1):
                     s = j * sub_j + jj
-                    r_float = i / sup_i + (s - x_sh1 * 0.5) / slope
+                    r_float = i / sup_i + (s - center) / slope
                     r = int(math.floor(r_float))
                     ratio = r_float - r
 
@@ -48,18 +52,18 @@ def _unshear_numba(x, sub_j, sup_i, slope, fill_value, out):
 
 def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0):
     r"""
-    Unshear a 3D array using anisotropic linear interpolation.
+    Unshear a 3D array using anisotropic linear interpolation (CPU implementation).
 
     Args:
-        x (array): 3D input (planes × cameraY × cameraX), dtype float32.
-        sub_j (int): subsampling factor along axis 1.
-        sup_i (float): upsampling factor along axis 0.
-        slope (float): shear slope (px along dim 1) / (px along dim 0).
-        out (np.ndarray, optional): pre-allocated output; if None, one is created.
+        x (array): 3D input (planes × cameraY × cameraX). Converted to float32.
+        sub_j (int): subsampling factor along axis 1. Set to 1 (no subsampling) or larger.
+        sup_i (float): upsampling factor along axis 0. Set to 1 (no upsampling) or larger.
+        slope (float): shear slope (px along dim 1) / (px along dim 0). You can use `get_slope` to calculate this value.
+        out (np.ndarray, optional): pre-allocated float32 output of shape (int(x.shape[0]*sup_i), x.shape[1]//sub_j, x.shape[2]).
         fill_value (float): value to use where no valid input voxels contribute.
 
     Returns:
-        array: the unsheared volume, dtype float32.
+        np.ndarray: the unsheared volume, dtype float32.
 
     Example with sub_j=2, sup_i=2, slope=3 (showing a slice along axis 2):
 
@@ -75,19 +79,17 @@ def unshear(x, sub_j, sup_i, slope, out=None, fill_value=0.0):
                     o-----o-----o                     o--o--o--o--o
                         axis 0                            axis 0
     """
-    x = np.asarray(x, dtype=np.float32, order='C')
-    y0 = int(x.shape[0] * sup_i)
-    y1 = x.shape[1] // sub_j
-    y2 = x.shape[2]
-    if not isinstance(sub_j, int):
-        raise ValueError(f"sub_j must be an integer, got {sub_j} of type {type(sub_j)}")
-    if sub_j > np.abs(slope):
-        warnings.warn(f"sub_j > abs(slope) leads to subsampling! sub_j: {sub_j}, slope: {slope}")
+    x = np.asarray(x, dtype=np.float32, order="C")
+    out_shape = check_args(x.shape, sub_j, sup_i, slope)
     if out is None:
-        out = np.zeros((y0, y1, y2), dtype=np.float32)
+        out = np.empty(out_shape, dtype=np.float32)
     else:
-        assert out.shape == (y0, y1, y2)
-        assert out.dtype == np.float32
+        if not isinstance(out, np.ndarray):
+            raise TypeError(f"out must be a numpy array, got {type(out)}")
+        if out.shape != out_shape:
+            raise ValueError(f"out has shape {out.shape}, expected {out_shape}")
+        if out.dtype != np.float32:
+            raise ValueError(f"out must be float32, got {out.dtype}")
 
     _unshear_numba(x, int(sub_j), float(sup_i), float(slope), float(fill_value), out)
     return out
